@@ -6,6 +6,7 @@
 ![status](https://img.shields.io/badge/status-planning-lightgrey)
 ![python](https://img.shields.io/badge/python-3.11+-blue)
 ![javascript](https://img.shields.io/badge/javascript-Next.js-yellow)
+![css](https://img.shields.io/badge/css-Tailwind-purple)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 ---
@@ -101,12 +102,13 @@
 | 인증 | JWT | 개인용이므로 단일 사용자로 시작 |
 | 배포 | Vercel (FE) + Render/Fly.io (BE) | Docker Compose로 로컬 통합 실행 |
 
-### 언어 역할 분담 (Python + JavaScript)
+### 언어 역할 분담 (Python + JavaScript + CSS)
 
 | 언어 | 담당 영역 | 이유 |
 |---|---|---|
 | **Python** | 백엔드 API, 시세·뉴스 수집, 손익 계산, 포트폴리오 분석 | 데이터 처리·통계 로직이 핵심이고 pandas/numpy 생태계 활용 |
-| **JavaScript** | 화면(UI), 차트, 입력 폼, 백엔드 API 호출 | 브라우저에서 동작하는 언어라 웹 화면은 JS가 표준 |
+| **JavaScript** | 화면 동작, 차트, 입력 폼, 백엔드 API 호출 | 브라우저에서 동작하는 언어라 웹 화면은 JS가 표준 |
+| **CSS** | 레이아웃, 색상·폰트, 반응형(모바일) 디자인, 다크 모드 | 화면의 모양과 배치를 담당 (Tailwind CSS + 전역 스타일 `globals.css`) |
 
 - 두 영역은 **REST API(JSON)** 로만 통신하므로, 계산 로직은 전부 Python에 두고 JS는 받아서 보여주기만 합니다.
 - 바이브코딩 시 프롬프트도 `backend/`(Python)와 `frontend/`(JS)로 나눠 요청하면 컨텍스트가 섞이지 않습니다.
@@ -216,6 +218,8 @@ my-stock-manager/
 │   │   ├── news/
 │   │   └── analysis/
 │   ├── components/
+│   ├── styles/
+│   │   └── globals.css       # 전역 스타일, 색상 변수, 다크 모드
 │   └── lib/api.js            # 백엔드 호출 함수 모음
 └── backend/                  # FastAPI
     ├── app/
