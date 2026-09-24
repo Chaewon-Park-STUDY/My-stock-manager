@@ -3,7 +3,7 @@
 > 배당금, 단타 수익, 장기투자 평가액, 이자 수익을 한 곳에서 관리하고
 > 보유 종목 뉴스와 포트폴리오 적정성 진단까지 제공하는 개인용 자산관리 앱
 
-![status](https://img.shields.io/badge/status-planning-lightgrey)
+![status](https://img.shields.io/badge/status-v0.1-blue)
 ![python](https://img.shields.io/badge/python-3.11+-blue)
 ![javascript](https://img.shields.io/badge/javascript-Next.js-yellow)
 ![css](https://img.shields.io/badge/css-Tailwind-purple)
@@ -223,19 +223,23 @@ my-stock-manager/
 │   └── lib/api.js            # 백엔드 호출 함수 모음
 └── backend/                  # FastAPI
     ├── app/
-    │   ├── main.py
-    │   ├── api/              # 라우터
-    │   ├── models/           # SQLAlchemy 모델
-    │   ├── schemas/          # Pydantic 스키마
-    │   ├── services/
-    │   │   ├── pnl.py        # FIFO 실현손익
-    │   │   ├── valuation.py  # 평가금액
-    │   │   ├── analysis.py   # 포트폴리오 진단
-    │   │   ├── market.py     # 시세 수집
-    │   │   └── news.py       # RSS 수집·매칭
-    │   └── scheduler.py
-    ├── alembic/
-    ├── tests/
+    │   ├── main.py           # 앱 진입점, 라우터 등록, CORS
+    │   ├── database.py       # DB 연결 (.env의 DATABASE_URL)
+    │   ├── models.py         # SQLAlchemy 테이블
+    │   ├── schemas.py        # Pydantic 입출력·검증
+    │   ├── api/
+    │   │   ├── accounts.py   # 계좌 CRUD
+    │   │   ├── trades.py     # 거래 CRUD + 초과매도 검증
+    │   │   ├── income.py     # 배당·이자 CRUD + 세금 계산
+    │   │   └── reports.py    # 보유 종목, 월별 리포트
+    │   └── services/
+    │       ├── pnl.py        # FIFO 실현손익·보유 종목
+    │       ├── income.py     # 세금 계산, 월별 집계
+    │       ├── valuation.py  # (v0.2) 평가금액
+    │       ├── analysis.py   # (v0.5) 포트폴리오 진단
+    │       ├── market.py     # (v0.2) 시세 수집
+    │       └── news.py       # (v0.4) RSS 수집·매칭
+    ├── tests/                # pytest
     └── requirements.txt
 ```
 
@@ -258,9 +262,24 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-alembic upgrade head
 uvicorn app.main:app --reload    # http://localhost:8000/docs
+pytest                           # 테스트 실행
 ```
+처음 실행하면 `backend/stock.db`(SQLite)가 자동 생성됩니다. 이 파일에 실제 거래 기록이 저장되며 `.gitignore`로 깃허브에는 올라가지 않습니다.
+
+### API (v0.1)
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| GET/POST | `/accounts` | 계좌 목록 / 추가 (`PUT`, `DELETE /accounts/{id}`) |
+| GET/POST | `/trades` | 거래 목록(계좌·종목·기간 필터) / 추가 — 보유보다 많이 팔면 400 |
+| GET/POST | `/dividends` | 배당 목록 / 추가 — 세전·세금(기본 15.4%)·세후 자동 계산 |
+| GET/POST | `/interest` | 이자 목록 / 추가 — 비과세는 `tax_rate: 0` |
+| GET | `/holdings` | 거래 기록으로 계산한 현재 보유 수량·평균단가 |
+| GET | `/reports/trading/monthly` | 월별 실현손익, 승률, 평균 수익/손실, 손익비 |
+| GET | `/reports/dividends/monthly` | 월별 배당 합계 (`?currency=USD`로 통화별 조회) |
+| GET | `/reports/interest/monthly` | 월별 이자 합계 |
+
+`http://localhost:8000/docs`에서 모든 API를 브라우저로 직접 실행해 볼 수 있습니다.
 
 ### Frontend
 ```bash
@@ -278,7 +297,7 @@ docker compose up --build
 
 ## 10. 로드맵
 
-- [ ] **v0.1 — 기록**: 계좌·거래·배당·이자 CRUD, 보유 종목 자동 계산
+- [x] **v0.1 — 기록**: 계좌·거래·배당·이자 CRUD, 보유 종목 자동 계산, 월별 실현손익·배당·이자 API
 - [ ] **v0.2 — 평가**: 일별 시세 연동, 장기투자 평가금액·수익률
 - [ ] **v0.3 — 리포트**: 월별 단타 실현손익, 월별 배당·이자 집계, 대시보드
 - [ ] **v0.4 — 뉴스**: 한국경제·매일경제 RSS 수집 및 종목 매칭
