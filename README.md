@@ -208,19 +208,21 @@ my-stock-manager/
 ├── README.md
 ├── docker-compose.yml
 ├── .env.example
-├── frontend/                 # Next.js
+├── frontend/                 # Next.js (JavaScript + Tailwind CSS)
 │   ├── app/
-│   │   ├── dashboard/
-│   │   ├── dividends/
-│   │   ├── trading/
-│   │   ├── long-term/
-│   │   ├── interest/
-│   │   ├── news/
-│   │   └── analysis/
-│   ├── components/
-│   ├── styles/
-│   │   └── globals.css       # 전역 스타일, 색상 변수, 다크 모드
-│   └── lib/api.js            # 백엔드 호출 함수 모음
+│   │   ├── page.js           # 대시보드 (/)
+│   │   ├── holdings/         # 보유 종목
+│   │   ├── trades/           # 거래 입력·월별 실현손익
+│   │   ├── dividends/        # 배당 입력·월별 배당
+│   │   ├── interest/         # 이자 입력·월별 이자
+│   │   ├── accounts/         # 계좌 관리
+│   │   ├── layout.js         # 공통 레이아웃, 폰트(Pretendard)
+│   │   └── globals.css       # 색상 토큰, 다크 모드, 공통 입력·버튼 스타일
+│   ├── components/           # Nav, 카드·표 등 UI, 월별 차트
+│   └── lib/
+│       ├── api.js            # 백엔드 호출 함수 모음
+│       ├── format.js         # 금액·날짜 표시 형식
+│       └── useApi.js         # 데이터 불러오기 훅
 └── backend/                  # FastAPI
     ├── app/
     │   ├── main.py           # 앱 진입점, 라우터 등록, CORS
@@ -287,6 +289,21 @@ cd frontend
 npm install
 npm run dev                      # http://localhost:3000
 ```
+백엔드(8000번)와 프론트엔드(3000번)를 **각각 다른 터미널에서** 켜 두어야 화면에 데이터가 나옵니다.
+백엔드 주소를 바꾸려면 `frontend/.env.local`에 `NEXT_PUBLIC_API_URL=http://주소:포트`를 적습니다.
+
+### 화면 (v0.1)
+| 메뉴 | 내용 |
+|---|---|
+| 대시보드 | 이번 달 확정 수익, 단타·배당·이자 요약, 월별 수익 차트, 보유 비중 |
+| 보유종목 | 계좌 용도별 보유 수량·평균단가·매입금액·비중 |
+| 거래 | 매수/매도 입력, 월별 실현손익(승률·손익비), 거래 내역 |
+| 배당 | 국내 15.4% / 미국 15% 세금 자동 계산, 원화·달러 따로 집계 |
+| 이자 | 15.4% / 비과세 / 직접 입력, 월별 이자 |
+| 계좌 | 단타·장기투자·배당·예적금 계좌 관리 |
+
+- 한국 증시 관례대로 **수익은 빨강, 손실은 파랑**으로 표시합니다.
+- 시스템 설정에 따라 **다크 모드**가 자동 적용되고, 모바일에서는 하단 탭바로 바뀝니다.
 
 ### Docker (통합 실행)
 ```bash
@@ -297,7 +314,7 @@ docker compose up --build
 
 ## 10. 로드맵
 
-- [x] **v0.1 — 기록**: 계좌·거래·배당·이자 CRUD, 보유 종목 자동 계산, 월별 실현손익·배당·이자 API
+- [x] **v0.1 — 기록**: 계좌·거래·배당·이자 CRUD, 보유 종목 자동 계산, 월별 실현손익·배당·이자 API, 대시보드·입력 화면
 - [ ] **v0.2 — 평가**: 일별 시세 연동, 장기투자 평가금액·수익률
 - [ ] **v0.3 — 리포트**: 월별 단타 실현손익, 월별 배당·이자 집계, 대시보드
 - [ ] **v0.4 — 뉴스**: 한국경제·매일경제 RSS 수집 및 종목 매칭

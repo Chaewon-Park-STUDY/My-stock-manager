@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* =========================================================
+   디자인 토큰 — 색은 여기서만 바꾸면 전체 화면에 반영됩니다.
+   한국 증시 관례: 수익(상승) = 빨강, 손실(하락) = 파랑
+   ========================================================= */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+  --line: #e5e8eb;
+  --ink: #191f28;
+  --ink-2: #4e5968;
+  --ink-3: #8b95a1;
+  --brand: #3182f6;
+  --brand-soft: #e8f3ff;
+  --up: #f04452;
+  --down: #3182f6;
+  --danger: #e42939;
+
+  /* 차트 계열색 (dataviz 기본 팔레트 1~3번, 색각이상 검증됨) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --grid: #eceef0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101013;
+    --surface: #1b1c20;
+    --surface-2: #232429;
+    --line: #2c2d33;
+    --ink: #f2f3f5;
+    --ink-2: #c3c7ce;
+    --ink-3: #8d939c;
+    --brand: #4c95ff;
+    --brand-soft: #1d2b44;
+    --up: #ff5b68;
+    --down: #5a9cff;
+    --danger: #ff5b68;
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --grid: #2a2b30;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-pretendard), system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "tnum"; /* 숫자 폭을 고정해 금액이 세로로 정렬되게 */
+}
+
+/* 숫자 입력칸의 위아래 화살표 숨기기 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 공통 입력·버튼 스타일 (className="input", "btn btn-primary" 처럼 사용) */
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-[15px] text-ink outline-none transition placeholder:text-ink-3 focus:border-brand focus:bg-surface;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-[15px] font-semibold transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-brand text-white hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply bg-surface-2 text-ink-2 hover:bg-line;
+  }
+}
