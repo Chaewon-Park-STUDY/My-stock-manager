@@ -1,0 +1,64 @@
+# =========================
+# 환경 변수 / 비밀 정보 (절대 커밋 금지)
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Python (backend)
+# =========================
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# =========================
+# JavaScript / Next.js (frontend)
+# =========================
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# 데이터베이스 / 개인 거래 데이터
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+data/raw/
+uploads/
+*.csv
+!sample*.csv
+
+# =========================
+# 로그 / 캐시
+# =========================
+logs/
+*.log
+.cache/
+
+# =========================
+# OS / 에디터
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
