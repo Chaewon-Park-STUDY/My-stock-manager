@@ -409,4 +409,4 @@ docker compose up --build
 ---
 
 ## License
-MIT
+MIT — 자세한 내용은 [LICENSE](LICENSE) 참고
