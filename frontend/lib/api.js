@@ -43,6 +43,13 @@ export const api = {
   dividends: crud("/dividends"),
   interest: crud("/interest"),
   holdings: (params) => request("/holdings" + qs(params)),
+  watchlist: {
+    list: (params) => request("/watchlist" + qs(params)),
+    add: (body) => request("/watchlist", { method: "POST", body }),
+    remove: (ticker) => request(`/watchlist/${encodeURIComponent(ticker)}`, { method: "DELETE" }),
+  },
+  refreshPrices: () => request("/prices/refresh", { method: "POST" }),
+  boxes: (ticker, params) => request(`/boxes/${encodeURIComponent(ticker)}` + qs(params)),
   reports: {
     trading: (params) => request("/reports/trading/monthly" + qs(params)),
     dividends: (params) => request("/reports/dividends/monthly" + qs(params)),

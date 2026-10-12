@@ -8,12 +8,14 @@ const ICONS = {
   swap: "M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4m4 4H7",
   coin: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zm0-13v8m-3-5.5c0-1 1.3-1.5 3-1.5s3 .7 3 1.7-1.3 1.3-3 1.3-3 .5-3 1.5 1.3 1.5 3 1.5 3-.5 3-1.5",
   bank: "M3 9 12 4l9 5M5 9v8m4.5-8v8m5-8v8M19 9v8M3 20h18",
+  box: "M3 17l5-5 4 3 4-6 5 4M4 4h16v16H4z",
   wallet: "M3 7a2 2 0 0 1 2-2h13v4M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2zm13 7h.01",
 };
 
 const ITEMS = [
   { href: "/", label: "대시보드", icon: "home" },
   { href: "/holdings", label: "보유종목", icon: "pie" },
+  { href: "/box", label: "박스권", icon: "box" },
   { href: "/trades", label: "거래", icon: "swap" },
   { href: "/dividends", label: "배당", icon: "coin" },
   { href: "/interest", label: "이자", icon: "bank" },
@@ -52,14 +54,14 @@ export default function Nav() {
             </Link>
           ))}
         </nav>
-        <p className="mt-auto px-3 text-xs text-ink-3">v0.1 · 개인 기록용</p>
+        <p className="mt-auto px-3 text-xs text-ink-3">v0.2 · 개인 기록용</p>
       </aside>
 
       {/* 모바일: 하단 탭바 */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-7 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         {ITEMS.map((it) => (
           <Link key={it.href} href={it.href}
-            className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium ${
+            className={`flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
               active(it.href) ? "text-brand" : "text-ink-3"
             }`}>
             <Icon name={it.icon} className="size-5" />

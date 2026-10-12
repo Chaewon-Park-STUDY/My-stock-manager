@@ -1,7 +1,8 @@
 """DB 테이블 정의 (SQLAlchemy ORM)."""
+import datetime as dt
 from datetime import date
 
-from sqlalchemy import Date, Float, ForeignKey, String
+from sqlalchemy import Date, Float, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -72,3 +73,28 @@ class Interest(Base):
     gross: Mapped[float] = mapped_column(Float)
     tax: Mapped[float] = mapped_column(Float)
     net: Mapped[float] = mapped_column(Float)
+
+
+class Price(Base):
+    """일봉 시세 캐시. 같은 (종목, 날짜)는 한 줄만."""
+
+    __tablename__ = "prices"
+    __table_args__ = (UniqueConstraint("ticker", "date", name="uq_price_ticker_date"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ticker: Mapped[str] = mapped_column(String(20), index=True)
+    date: Mapped[dt.date] = mapped_column(Date, index=True)
+    open: Mapped[float] = mapped_column(Float)
+    high: Mapped[float] = mapped_column(Float)
+    low: Mapped[float] = mapped_column(Float)
+    close: Mapped[float] = mapped_column(Float)
+    volume: Mapped[float] = mapped_column(Float, default=0)
+
+
+class Watch(Base):
+    """박스권을 추적할 관심 종목."""
+
+    __tablename__ = "watchlist"
+
+    ticker: Mapped[str] = mapped_column(String(20), primary_key=True)
+    name: Mapped[str | None] = mapped_column(String(50))

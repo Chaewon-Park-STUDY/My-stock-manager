@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import accounts, income, reports, trades
+from .api import accounts, income, market, reports, trades
 from .database import Base, engine
 
 
@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for r in (accounts.router, trades.router, income.router, reports.router):
+for r in (accounts.router, trades.router, income.router, reports.router, market.router):
     app.include_router(r)
 
 
