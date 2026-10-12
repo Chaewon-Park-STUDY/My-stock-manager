@@ -103,6 +103,7 @@
 - 관심 종목의 일봉을 받아 **박스권(횡보 구간)** 을 자동 탐지하고 차트에 구간으로 표시
 - 현재 상태: 박스 중간 / 상단 근접 / 하단 근접 / 돌파·이탈 시도 중 / 상향 돌파·하향 이탈 N일째 / 박스 없음(추세 구간)
 - 박스 안에서 현재가 위치(하단 0% ~ 상단 100%) 표시, 보유 종목을 한 번에 관심 종목으로 추가
+- **종목 검색**: "하이닉"처럼 이름 일부만 입력해도 종목코드를 찾아줌 (박스권·거래·배당 입력 화면 공통). 상장 종목 목록은 FinanceDataReader의 KRX 캐시에서 받아 DB에 저장
 - **탐지 규칙** (`services/boxrange.py`, 화면에서 형성 기간·최대 폭 조정 가능)
   1. **형성**: 최근 $W$거래일(기본 20일) 고가의 95% 분위수를 상단 $U$, 저가의 5% 분위수를 하단 $L$로 둔다 — 꼬리 한 번에 박스가 넓어지지 않도록 최댓값·최솟값 대신 분위수 사용
   2. 폭 $(U - L) / \tfrac{U+L}{2} \le$ 12%이고, 상단(2% 이내)과 하단에 **각각 2번 이상 따로** 닿아야 박스로 인정 — 연속된 날은 1번으로 세므로 꾸준한 추세는 박스로 잡히지 않음
@@ -169,7 +170,7 @@
 | 테이블 | 주요 컬럼 |
 |---|---|
 | `accounts` | id, name, broker, type (`LONG_TERM` / `TRADING` / `DIVIDEND` / `SAVINGS`) |
-| `securities` | ticker, name, market (`KOSPI`/`KOSDAQ`/`NASDAQ`/…), sector, currency |
+| `securities` | ticker, name, market (`KOSPI`/`KOSDAQ`/`KONEX`), marcap, updated *(종목명 검색용 상장 종목 목록, 7일마다 갱신)* |
 | `trades` | id, account_id, ticker, side (`BUY`/`SELL`), qty, price, fee, tax, traded_at |
 | `holdings` | account_id, ticker, qty, avg_price *(trades로부터 파생 · 캐시)* |
 | `dividends` | id, account_id, ticker, pay_date, dps, qty, gross, tax, net |
@@ -299,7 +300,7 @@ my-stock-manager/
 │   │   ├── habits/           # (예정) 내 투자 습관 — 생존곡선·앵커링 진단
 │   │   ├── layout.js         # 공통 레이아웃, 폰트(Pretendard)
 │   │   └── globals.css       # 색상 토큰, 다크 모드, 공통 입력·버튼 스타일
-│   ├── components/           # Nav, 카드·표 등 UI, 월별 차트
+│   ├── components/           # Nav, 카드·표 등 UI, 차트, 종목 검색(StockSearch)
 │   └── lib/
 │       ├── api.js            # 백엔드 호출 함수 모음
 │       ├── format.js         # 금액·날짜 표시 형식
@@ -315,12 +316,14 @@ my-stock-manager/
     │   │   ├── trades.py     # 거래 CRUD + 초과매도 검증
     │   │   ├── income.py     # 배당·이자 CRUD + 세금 계산
     │   │   ├── reports.py    # 보유 종목, 월별 리포트
-    │   │   └── market.py     # 관심 종목, 시세 갱신, 박스권
+    │   │   ├── market.py     # 관심 종목, 시세 갱신, 박스권
+    │   │   └── securities.py # 종목 검색
     │   └── services/
     │       ├── pnl.py        # FIFO 실현손익·보유 종목
     │       ├── income.py     # 세금 계산, 월별 집계
     │       ├── boxrange.py   # 박스권 탐지·현재 상태
     │       ├── market.py     # 일봉 시세 수집(FinanceDataReader)·캐시
+    │       ├── securities.py # 상장 종목 목록·종목명 검색
     │       ├── valuation.py  # (v0.2) 평가금액
     │       ├── habits/       # (v0.3~0.5) 투자 습관 진단
     │       │   ├── panel.py      # 로트 × 거래일 패널 생성
@@ -367,6 +370,7 @@ pytest                           # 테스트 실행
 | GET | `/reports/trading/monthly` | 월별 실현손익, 승률, 평균 수익/손실, 손익비 |
 | GET | `/reports/dividends/monthly` | 월별 배당 합계 (`?currency=USD`로 통화별 조회) |
 | GET | `/reports/interest/monthly` | 월별 이자 합계 |
+| GET | `/securities/search?q=` | 종목명·코드 일부로 상장 종목 검색 (시가총액 순) |
 | GET/POST | `/watchlist` | 관심 종목 + 현재 박스 상태 / 추가(추가 시 시세 2년치 자동 수집) |
 | POST | `/prices/refresh` | 모든 관심 종목 시세를 최신으로 갱신 |
 | GET | `/boxes/{ticker}` | 일봉 + 박스 구간 + 현재 상태 (`window`, `max_width`, `days` 조정) |
@@ -406,7 +410,7 @@ docker compose up --build
 ## 11. 로드맵
 
 - [x] **v0.1 — 기록**: 계좌·거래·배당·이자 CRUD, 보유 종목 자동 계산, 월별 실현손익·배당·이자, 대시보드·입력 화면
-- [x] **v0.2a — 박스권 추적**: 일봉 시세 수집·캐시, 박스권 탐지·돌파 판정, 관심 종목·차트 화면
+- [x] **v0.2a — 박스권 추적**: 일봉 시세 수집·캐시, 박스권 탐지·돌파 판정, 관심 종목·차트 화면, 종목명 검색
 - [ ] **v0.2 — 시세·패널**: `pykrx` 일별 종가·52주 최고가 수집, 장기투자 평가금액·수익률, **로트 × 거래일 패널** 생성
 - [ ] **v0.3 — 생존분석**: Kaplan–Meier 보유기간 곡선, 시간가변 Cox (처분효과·본전 앵커링)
 - [ ] **v0.4 — 앵커링 진단**: 52주 고점·이전 매도가·라운드넘버 검정

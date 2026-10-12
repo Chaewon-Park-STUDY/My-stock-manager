@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import BoxChart, { BOX_FILL } from "@/components/BoxChart";
+import StockSearch from "@/components/StockSearch";
 import { Card, DeleteButton, Empty, ErrorBox, Field, Flash, Loading, PageHeader, Segmented } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useApi, useFlash } from "@/lib/useApi";
@@ -53,7 +54,6 @@ function PositionBar({ status }) {
 export default function BoxPage() {
   const [params, setParams] = useState({ window: 20, max_width: 0.12 });
   const [selected, setSelected] = useState(null);
-  const [form, setForm] = useState({ ticker: "", name: "" });
   const [busy, setBusy] = useState(false);
   const [flash, showFlash] = useFlash();
 
@@ -82,7 +82,6 @@ export default function BoxPage() {
       if (r.error) showFlash(r.error, "error");
       else showFlash(`${name || ticker} 추가 · 시세 ${r.fetched}일 받음`);
       setSelected(r.ticker);
-      setForm({ ticker: "", name: "" });
       watch.reload();
     } catch (err) {
       showFlash(err.message, "error");
@@ -126,13 +125,8 @@ export default function BoxPage() {
       <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
         <div className="order-2 flex flex-col gap-4 lg:order-1 lg:sticky lg:top-6 lg:self-start">
           <Card title="종목 추가">
-            <form className="flex flex-col gap-3" onSubmit={(e) => { e.preventDefault(); add(form.ticker.trim(), form.name.trim()); }}>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="종목코드"><input className="input" value={form.ticker} onChange={(e) => setForm({ ...form, ticker: e.target.value })} placeholder="005930" required /></Field>
-                <Field label="종목명"><input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="삼성전자" /></Field>
-              </div>
-              <button className="btn btn-primary" disabled={busy}>{busy ? "시세 받는 중…" : "추가하고 시세 받기"}</button>
-            </form>
+            <StockSearch allowRaw onSelect={(s) => add(s.ticker, s.name)}
+              hint={busy ? "시세 받는 중…" : "고르면 바로 추가하고 2년치 시세를 받아요 · ETF·미국 주식은 코드 입력 후 Enter"} />
             {suggestions.length > 0 && (
               <div className="mt-4">
                 <p className="mb-2 text-[13px] text-ink-3">보유 종목에서 추가</p>

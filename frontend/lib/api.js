@@ -48,6 +48,9 @@ export const api = {
     add: (body) => request("/watchlist", { method: "POST", body }),
     remove: (ticker) => request(`/watchlist/${encodeURIComponent(ticker)}`, { method: "DELETE" }),
   },
+  securities: {
+    search: (q) => request("/securities/search" + qs({ q, limit: 8 })),
+  },
   refreshPrices: () => request("/prices/refresh", { method: "POST" }),
   boxes: (ticker, params) => request(`/boxes/${encodeURIComponent(ticker)}` + qs(params)),
   reports: {

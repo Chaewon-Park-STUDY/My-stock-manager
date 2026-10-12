@@ -98,3 +98,15 @@ class Watch(Base):
 
     ticker: Mapped[str] = mapped_column(String(20), primary_key=True)
     name: Mapped[str | None] = mapped_column(String(50))
+
+
+class Security(Base):
+    """상장 종목 목록 (종목명 검색용). 하루 한 번 정도 새로 받아온다."""
+
+    __tablename__ = "securities"
+
+    ticker: Mapped[str] = mapped_column(String(20), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), index=True)
+    market: Mapped[str] = mapped_column(String(20))
+    marcap: Mapped[float] = mapped_column(Float, default=0)  # 시가총액 (검색 결과 정렬용)
+    updated: Mapped[dt.date] = mapped_column(Date)
