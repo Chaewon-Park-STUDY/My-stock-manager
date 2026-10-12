@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   Card, DeleteButton, Empty, ErrorBox, Field, Flash, Loading, PageHeader, Segmented, Stat, Table,
 } from "@/components/ui";
+import StockSearch from "@/components/StockSearch";
 import { api } from "@/lib/api";
 import { money, monthLabel, num, today } from "@/lib/format";
 import { useApi, useFlash } from "@/lib/useApi";
@@ -95,6 +96,10 @@ export default function DividendsPage() {
                 {investAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </Field>
+            {form.currency === "KRW" && (
+              <StockSearch onSelect={(s) => setForm((f) => ({ ...f, ticker: s.ticker, name: s.name || f.name }))}
+                hint="고르면 종목코드·종목명이 자동으로 채워져요" />
+            )}
             <div className="grid grid-cols-2 gap-3">
               <Field label="종목코드"><input className="input" value={form.ticker} onChange={set("ticker")} placeholder={form.currency === "KRW" ? "005930" : "SCHD"} required /></Field>
               <Field label="종목명"><input className="input" value={form.name} onChange={set("name")} placeholder={form.currency === "KRW" ? "삼성전자" : "슈왑 배당 ETF"} /></Field>

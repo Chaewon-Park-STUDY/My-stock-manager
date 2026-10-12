@@ -3,6 +3,7 @@ uvicorn[standard]>=0.30
 sqlalchemy>=2.0
 pydantic>=2.7
 python-dotenv>=1.0
+finance-datareader>=0.9  # 일봉 시세 (박스권 추적)
 
 # 테스트
 pytest>=8.0
